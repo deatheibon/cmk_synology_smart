@@ -1,13 +1,14 @@
 #!/bin/bash
+SMARTCTL=$(which smartctl)
 echo '<<<smart>>>'
-for D in $(ls -1 /dev/* | grep -E -o "/dev/sd[a-z]{1,10}|/dev/nvme[0-9]{1,10}n[0-9]{1,10}" | uniq); do
-    VEND="ATA"
-    MODEL=$( /bin/smartctl -a $D | grep -i "device model" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")
-    if [ "${MODEL}" == "" ]; then
-        MODEL=$( /bin/smartctl -a $D | grep -i "product" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")
-    fi
-    SERNO=$( /bin/smartctl -a $D | grep -i "serial number" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")
-    CMD="/bin/smartctl -v 9,raw48 -A $D"
-    DNAME="${MODEL}_${SERNO}"
-    [ -n "$CMD" ] && $CMD | grep Always | egrep -v '^188(.*)Command_Timeout(.*)' | sed "s|^|$DNAME $VEND $MODEL |"
+for D in $(ls -1 /dev/* | grep -E -o "/dev/sd[a-z]{1,10}|/dev/nvme[0-9]{1,10}" | uniq); do
+        VEND="ATA"
+        MODEL=$( ${SMARTCTL} -a $D | grep -i "device model" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")
+        if [ "${MODEL}" == "" ]; then
+                MODEL=$( ${SMARTCTL} -a $D | grep -i "product" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")
+        fi
+        SERNO=$( ${SMARTCTL} -a $D | grep -i "serial number" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")
+        CMD="${SMARTCTL} -v 9,raw48 -A $D"
+        DNAME="${MODEL}_${SERNO}"
+        [ -n "$CMD" ] && $CMD | grep Always | egrep -v '^188(.*)Command_Timeout(.*)' | sed "s|^|$DNAME $VEND $MODEL |"
 done 2>/dev/null
