@@ -1,6 +1,6 @@
 #!/bin/bash
 echo '<<<smart>>>'
-for D in $(ls -1 /dev/sd* | grep -E -o "/dev/sd[a-z]{1,10}" | uniq); do
+for D in $(ls -1 /dev/* | grep -E -o "/dev/sd[a-z]{1,10}|/dev/nvme[0-9]{1,10}n[0-9]{1,10}" | uniq); do
     VEND="ATA"
     MODEL=$( /bin/smartctl -a $D | grep -i "device model" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")
     if [ "${MODEL}" == "" ]; then
