@@ -3,7 +3,7 @@ SMARTCTL=$(which smartctl)
 echo '<<<smart>>>'
 for D in $(ls -1 /dev/* | grep -E -o "/dev/sd[a-z]{1,10}|/dev/nvme[0-9]{1,10}" | uniq); do
         VEND="ATA"
-        MODEL="$D $(${SMARTCTL} -a $D | grep -i "device model" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")"
+        MODEL=$(${SMARTCTL} -a $D | grep -i "device model" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")
         if [ "${MODEL}" == "" ]; then
                 MODEL=$( ${SMARTCTL} -a $D | grep -i "product" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")
         fi
